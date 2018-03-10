@@ -16,7 +16,8 @@ namespace Assignment1
             //Run exercises
             //SlideExercises();
             //AssignmentOnedotOne(data);
-            FindNearestNeighbour(data, data.Values.FirstOrDefault(q => q.UserId == 7), 0.35, 3);
+            //AssignmentOnedotTwo(data);
+            //AssignmentOnedotThree(data);
 
             Console.ReadKey();
         }
@@ -54,30 +55,12 @@ namespace Assignment1
             Dictionary<int, double> nearestNeighbourPearson = new Dictionary<int, double>();
             Dictionary<int, double> nearestNeighbourCosine = new Dictionary<int, double>();
 
-            //Remove current user from dictionary
-            userPreferences.Remove(target.UserId);
-
-            foreach (KeyValuePair<int, UserPreference> keyPair in userPreferences)
-            {
-                int user = keyPair.Key;
-                UserPreference preference = keyPair.Value;
-
-                var euclidian = 1 / (1 + CalculateEuclidian(preference, target));
-                var pearson = CalculatePearson(preference, target);
-                var cosine = CalculateCosine(preference, target);
-
-                //Check for euclidian
-                if (euclidian > threshold)
-                    nearestNeighbourEuclidian.Add(user, euclidian);
-
-                //Check for pearson
-                if (pearson > threshold)
-                    nearestNeighbourPearson.Add(user, pearson);
-
-                //Check for cosine
-                if (cosine > threshold)
-                    nearestNeighbourCosine.Add(user, cosine);
-            }
+            //Get nearest neighbours
+            var nearestNeighbours = new SimilarityCalculator().FindNearestNeighbour(userPreferences, target,
+                threshold, max);
+            nearestNeighbours.TryGetValue(1, out nearestNeighbourEuclidian);
+            nearestNeighbours.TryGetValue(2, out nearestNeighbourPearson);
+            nearestNeighbours.TryGetValue(3, out nearestNeighbourCosine);
 
             Console.WriteLine("\nNearest neighbours using Euclidian:");
             Console.WriteLine("------------------------------------------");
@@ -216,6 +199,17 @@ namespace Assignment1
         {
             CalculatePearson(userPreferences.Values.FirstOrDefault(s => s.UserId == 3), 
                 userPreferences.Values.FirstOrDefault(s => s.UserId == 4));
+        }
+
+        private static void AssignmentOnedotTwo(Dictionary<int, UserPreference> userPreferences)
+        {
+            FindNearestNeighbour(userPreferences, 
+                userPreferences.Values.FirstOrDefault(q => q.UserId == 7), 0.35, 3);
+        }
+
+        private static void AssignmentOnedotThree(Dictionary<int, UserPreference> userPreferences)
+        {
+           
         }
 
         #endregion

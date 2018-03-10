@@ -197,25 +197,9 @@ namespace Assignment1.Components
                     userTwoRating.Add((int)itemId, 0);
             }
 
-            int count = 0;
-            while (userOneRating.Count != userTwoRating.Count)
-            {
-                if (userTwoRating.Count < userOneRating.Count)
-                {
-                    if (userTwoRating.Keys.Contains(userOneRating.ElementAt(count).Key) == false)
-                    {
-                        userTwoRating.Add(userOne.Ratings.ElementAt(count).Key, 0);
-                    }
-                } else
-                {
-                    if (userOneRating.Keys.Contains(userTwo.Ratings.ElementAt(count).Key) == false)
-                    {
-                        userOneRating.Add(userTwo.Ratings.ElementAt(count).Key, 0);
-                    }
-                }
-                
-                count++;
-            }
+            var newLists = AddMissingItems(userOneRating, userTwoRating);
+            newLists.TryGetValue(1, out userOneRating);
+            newLists.TryGetValue(2, out userTwoRating);
 
             //Calculate the Cosine similarity
             double cosine = 0;
@@ -251,5 +235,75 @@ namespace Assignment1.Components
 
             return cosine;
         }
+
+        public Dictionary<int, Dictionary<int, double>> FindNearestNeighbour(Dictionary<int, UserPreference> userPreferences, 
+            UserPreference target, double threshold, int max)
+        {
+            Dictionary<int, double> nearestNeighbourEuclidian = new Dictionary<int, double>();
+            Dictionary<int, double> nearestNeighbourPearson = new Dictionary<int, double>();
+            Dictionary<int, double> nearestNeighbourCosine = new Dictionary<int, double>();
+
+            //Remove current user from dictionary
+            userPreferences.Remove(target.UserId);
+
+            foreach (KeyValuePair<int, UserPreference> keyPair in userPreferences)
+            {
+                int user = keyPair.Key;
+                UserPreference preference = keyPair.Value;
+
+                var euclidian = 1 / (1 + Euclidian(preference, target));
+                var pearson = Pearson(preference, target);
+                var cosine = Cosine(preference, target);
+
+                //Check for euclidian
+                if (euclidian > threshold)
+                    nearestNeighbourEuclidian.Add(user, euclidian);
+
+                //Check for pearson
+                if (pearson > threshold)
+                    nearestNeighbourPearson.Add(user, pearson);
+
+                //Check for cosine
+                if (cosine > threshold)
+                    nearestNeighbourCosine.Add(user, cosine);
+            }
+
+            var listToReturn = new Dictionary<int, Dictionary<int, double>>();
+            listToReturn.Add(1, nearestNeighbourEuclidian);
+            listToReturn.Add(2, nearestNeighbourPearson);
+            listToReturn.Add(3, nearestNeighbourCosine);
+
+            return listToReturn;
+        }
+
+        private Dictionary<int, Dictionary<int, double>> AddMissingItems(Dictionary<int, double> userOneRatings, Dictionary<int, double> userTwoRatings)
+        {
+            int count = 0;
+            while (userOneRatings.Count != userTwoRatings.Count)
+            {
+                if (userTwoRatings.Count < userOneRatings.Count)
+                {
+                    if (userTwoRatings.Keys.Contains(userOneRatings.ElementAt(count).Key) == false)
+                    {
+                        userTwoRatings.Add(userOneRatings.ElementAt(count).Key, 0);
+                    }
+                } else
+                {
+                    if (userOneRatings.Keys.Contains(userTwoRatings.ElementAt(count).Key) == false)
+                    {
+                        userOneRatings.Add(userTwoRatings.ElementAt(count).Key, 0);
+                    }
+                }
+
+                count++;
+            }
+
+            var listToReturn = new Dictionary<int, Dictionary<int, double>>();
+            listToReturn.Add(1, userOneRatings);
+            listToReturn.Add(2, userTwoRatings);
+
+            return listToReturn;
+        }
+
     }
 }
