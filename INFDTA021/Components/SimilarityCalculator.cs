@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Assignment1.Models;
 
 namespace Assignment1.Components
@@ -180,6 +181,8 @@ namespace Assignment1.Components
 
                 if (itemId != null && givenRating != null)
                     userOneRating.Add((int)itemId, (double)givenRating);
+                else
+                    userOneRating.Add((int)itemId, 0);
             }
 
             //Check if each article has a rating
@@ -190,6 +193,28 @@ namespace Assignment1.Components
 
                 if (itemId != null && givenRating != null)
                     userTwoRating.Add((int)itemId, (double)givenRating);
+                else
+                    userTwoRating.Add((int)itemId, 0);
+            }
+
+            int count = 0;
+            while (userOneRating.Count != userTwoRating.Count)
+            {
+                if (userTwoRating.Count < userOneRating.Count)
+                {
+                    if (userTwoRating.Keys.Contains(userOneRating.ElementAt(count).Key) == false)
+                    {
+                        userTwoRating.Add(userOne.Ratings.ElementAt(count).Key, 0);
+                    }
+                } else
+                {
+                    if (userOneRating.Keys.Contains(userTwo.Ratings.ElementAt(count).Key) == false)
+                    {
+                        userOneRating.Add(userTwo.Ratings.ElementAt(count).Key, 0);
+                    }
+                }
+                
+                count++;
             }
 
             //Calculate the Cosine similarity
@@ -198,9 +223,9 @@ namespace Assignment1.Components
             double sumX = 0;
             double sumY = 0;
 
-            foreach (var keyValueOne in userOne.Ratings)
+            foreach (var keyValueOne in userOneRating)
             {
-                foreach (var keyValueTwo in userTwo.Ratings)
+                foreach (var keyValueTwo in userTwoRating)
                 {
                     if (keyValueOne.Key == keyValueTwo.Key)
                     {

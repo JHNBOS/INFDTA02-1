@@ -14,9 +14,9 @@ namespace Assignment1
             var data = GetDictionary();
 
             //Run exercises
-            SlideExercises();
-            //PearsonBetweenUser3And4(data);
-            //FindNearestNeighbour(data, data.Values.FirstOrDefault(q => q.UserId == 7), 0.35, 3);
+            //SlideExercises();
+            //AssignmentOnedotOne(data);
+            FindNearestNeighbour(data, data.Values.FirstOrDefault(q => q.UserId == 7), 0.35, 3);
 
             Console.ReadKey();
         }
@@ -68,80 +68,15 @@ namespace Assignment1
 
                 //Check for euclidian
                 if (euclidian > threshold)
-                {
                     nearestNeighbourEuclidian.Add(user, euclidian);
-
-                    /*
-                    if (nearestNeighbourEuclidian.Count >= max)
-                    {
-                        //Sort list ascending(lowest value is at element 0) and take first element
-                        if (euclidian > nearestNeighbourEuclidian.OrderBy(o => o.Value).ElementAt(0).Value)
-                        {
-                            nearestNeighbourEuclidian.Remove(nearestNeighbourEuclidian.ElementAt(0).Key);
-                            nearestNeighbourEuclidian.Add(user, euclidian);
-                        }
-                    } else
-                    {
-                        nearestNeighbourEuclidian.Add(user, euclidian);
-                    }
-
-                    /*
-                    if (!preference.Ratings.Values.All(target.Ratings.Values.Contains)
-                        && preference.Ratings.Values.Count >= target.Ratings.Values.Count)
-                    {}
-                    */
-                }
 
                 //Check for pearson
                 if (pearson > threshold)
-                {
                     nearestNeighbourPearson.Add(user, pearson);
-
-                    /*
-                    if (nearestNeighbourPearson.Count >= max)
-                    {
-                        //Sort list ascending(lowest value is at element 0) and take first element
-                        if (euclidian > nearestNeighbourPearson.OrderBy(o => o.Value).ElementAt(0).Value)
-                        {
-                            nearestNeighbourPearson.Remove(nearestNeighbourPearson.ElementAt(0).Key);
-                            nearestNeighbourPearson.Add(user, pearson);
-                        }
-                    } else
-                    {
-                        nearestNeighbourPearson.Add(user, pearson);
-                    }
-
-                    /*
-                    if (!preference.Ratings.Values.All(target.Ratings.Values.Contains)
-                        && preference.Ratings.Values.Count >= target.Ratings.Values.Count)
-                    {}
-                    */
-                }
 
                 //Check for cosine
                 if (cosine > threshold)
-                {
                     nearestNeighbourCosine.Add(user, cosine);
-                    /*
-                    if (nearestNeighbourCosine.Count >= max)
-                    {
-                        //Sort list ascending(lowest value is at element 0) and take first element
-                        if (euclidian > nearestNeighbourCosine.OrderBy(o => o.Value).ElementAt(0).Value)
-                        {
-                            nearestNeighbourCosine.Remove(nearestNeighbourCosine.ElementAt(0).Key);
-                            nearestNeighbourCosine.Add(user, cosine);
-                        }
-                    } else
-                    {
-                        nearestNeighbourCosine.Add(user, cosine);
-                    }
-
-                    /*
-                    if (!preference.Ratings.Values.All(target.Ratings.Values.Contains)
-                        && preference.Ratings.Values.Count >= target.Ratings.Values.Count)
-                    {}
-                    */
-                }
             }
 
             Console.WriteLine("\nNearest neighbours using Euclidian:");
@@ -160,7 +95,7 @@ namespace Assignment1
 
             Console.WriteLine("\nNearest neighbours using Cosine:");
             Console.WriteLine("------------------------------------------");
-            foreach (KeyValuePair<int, double> item in nearestNeighbourCosine.OrderBy(o => o.Value).Take(max))
+            foreach (KeyValuePair<int, double> item in nearestNeighbourCosine.OrderByDescending(o => o.Value).Take(max))
             {
                 Console.WriteLine("User " + item.Key + " with a correlation of " + item.Value);
             }
@@ -256,8 +191,6 @@ namespace Assignment1
 
             var listAmy2 = new Dictionary<int, double>();
             listAmy2.Add(1, 3.0);
-            listAmy2.Add(2, null);
-            listAmy2.Add(3, null);
             UserPreference amyTwo = new UserPreference(3, listAmy2);
 
             var listX2 = new Dictionary<int, double>();
@@ -279,7 +212,7 @@ namespace Assignment1
             Console.WriteLine("Cosine between Amy and X (incomplete) = " + five);
         }
 
-        private static void PearsonBetweenUser3And4(Dictionary<int, UserPreference>  userPreferences)
+        private static void AssignmentOnedotOne(Dictionary<int, UserPreference>  userPreferences)
         {
             CalculatePearson(userPreferences.Values.FirstOrDefault(s => s.UserId == 3), 
                 userPreferences.Values.FirstOrDefault(s => s.UserId == 4));
