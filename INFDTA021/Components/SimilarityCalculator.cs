@@ -218,7 +218,9 @@ namespace Assignment1.Components
             }
 
             var topPart = sumXY;
-            var bottomPart = (Math.Sqrt(sumX)) * (Math.Sqrt(sumY));
+            var sqrtX = Math.Sqrt(sumX);
+            var sqrtY = Math.Sqrt(sumY);
+            var bottomPart = (sqrtX) * (sqrtY);
 
             cosine = topPart / bottomPart;
 
