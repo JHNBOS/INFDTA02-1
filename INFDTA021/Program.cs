@@ -17,7 +17,7 @@ namespace Assignment1
             //SlideExercises();
             //AssignmentOnedotOne(data);
             //AssignmentOnedotTwo(data);
-            //AssignmentOnedotThree(data);
+            AssignmentOnedotThree(data);
 
             Console.ReadKey();
         }
@@ -48,7 +48,7 @@ namespace Assignment1
             return cosine;
         }
 
-        private static void FindNearestNeighbour(Dictionary<int, UserPreference> userPreferences, UserPreference target, 
+        private static void FindNearestNeighbour(Dictionary<int, UserPreference> userPreferences, UserPreference target,
             double threshold, int max)
         {
             Dictionary<int, double> nearestNeighbourEuclidian = new Dictionary<int, double>();
@@ -56,7 +56,7 @@ namespace Assignment1
             Dictionary<int, double> nearestNeighbourCosine = new Dictionary<int, double>();
 
             //Get nearest neighbours
-            var nearestNeighbours = new SimilarityCalculator().FindNearestNeighbour(userPreferences, target,
+            var nearestNeighbours = new NearestNeighbourCalculator().FindNearestNeighbour(userPreferences, target,
                 threshold, max);
             nearestNeighbours.TryGetValue(1, out nearestNeighbourEuclidian);
             nearestNeighbours.TryGetValue(2, out nearestNeighbourPearson);
@@ -81,6 +81,21 @@ namespace Assignment1
             foreach (KeyValuePair<int, double> item in nearestNeighbourCosine.OrderByDescending(o => o.Value).Take(max))
             {
                 Console.WriteLine("User " + item.Key + " with a correlation of " + item.Value);
+            }
+        }
+
+        private static void PredictRating(Dictionary<int, UserPreference> userPreferences,
+            UserPreference target, List<int> itemsToRate, double threshold, int max)
+        {
+            Console.WriteLine("\nPrediction(s) for user " + target.UserId + ":");
+            Console.WriteLine("------------------------------------------");
+
+            var predictions = new PredictRatingCalculator().PredictRatingByNeighbours(userPreferences,
+                target, itemsToRate, threshold, max);
+
+            foreach (KeyValuePair<int, double> prediction in predictions)
+            {
+                Console.WriteLine("Item " + prediction.Key + " with a rating of " + prediction.Value);
             }
         }
 
@@ -195,21 +210,27 @@ namespace Assignment1
             Console.WriteLine("Cosine between Amy and X (incomplete) = " + five);
         }
 
-        private static void AssignmentOnedotOne(Dictionary<int, UserPreference>  userPreferences)
+        private static void AssignmentOnedotOne(Dictionary<int, UserPreference> userPreferences)
         {
-            CalculatePearson(userPreferences.Values.FirstOrDefault(s => s.UserId == 3), 
+            CalculatePearson(userPreferences.Values.FirstOrDefault(s => s.UserId == 3),
                 userPreferences.Values.FirstOrDefault(s => s.UserId == 4));
         }
 
         private static void AssignmentOnedotTwo(Dictionary<int, UserPreference> userPreferences)
         {
-            FindNearestNeighbour(userPreferences, 
+            FindNearestNeighbour(userPreferences,
                 userPreferences.Values.FirstOrDefault(q => q.UserId == 7), 0.35, 3);
         }
 
         private static void AssignmentOnedotThree(Dictionary<int, UserPreference> userPreferences)
         {
-           
+            List<int> items = new List<int>();
+            items.Add(101);
+            items.Add(103);
+            items.Add(106);
+
+            PredictRating(userPreferences,
+                userPreferences.Values.FirstOrDefault(q => q.UserId == 7), items, 0.35, 3);
         }
 
         #endregion
