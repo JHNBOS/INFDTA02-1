@@ -14,17 +14,22 @@ namespace Assignment1.Models
             this.Ratings = ratings;
         }
 
-        public void AddRating(int articleId, double rating)
+        public void AddRating(int itemId, double rating)
         {
-            Ratings.Add(articleId, rating);
+            Ratings.Add(itemId, rating);
+        }
+
+        public void RemoveRating(int itemId)
+        {
+            Ratings.Remove(itemId);
         }
 
         public override string ToString()
         {
-            var rated = String.Format("\nUser {0} rated the following article(s):\n\n", this.UserId);
+            var rated = String.Format("\nUser {0} rated the following item(s):\n\n", this.UserId);
             foreach (var rating in this.Ratings)
             {
-                rated += String.Format("\tArticle {0} has been rated with a {1}\n", rating.Key, rating.Value.ToString("N1"));
+                rated += String.Format("\tItem {0} has been rated with a {1}\n", rating.Key, rating.Value.ToString("N1"));
             }
             rated += "\n-------------------------------------------------";
 
