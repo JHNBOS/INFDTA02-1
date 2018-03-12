@@ -6,21 +6,18 @@ namespace Assignment1.Components
 {
     public class PredictRating
     {
-        public double PredictRatingByNeighbours(Dictionary<int, UserPreference> userPreferences, 
-            int targetUser, int itemToRate, double threshold, int max, Similarity similarityType)
+        public double PredictRatingByNeighbours(Dictionary<int, UserPreference> userPreferences,
+            UserPreference targetUser, int itemToRate, double threshold, int max, Similarity similarityType)
         {
-            //Get target user by user id
-            var target = userPreferences.FirstOrDefault(q => q.Key == targetUser).Value;
-
             //Get nearest neighbours of target with their similarity
-            var nearestNeighbours = new NearestNeighbour().FindNearestNeighbour(userPreferences, targetUser, 
+            var nearestNeighbours = new NearestNeighbour().FindNearestNeighbour(userPreferences, targetUser.UserId, 
                 threshold, max, similarityType);
 
             double numerator = 0;
             double denominator = 0;
 
             foreach (KeyValuePair<int, UserPreference> userPreference in userPreferences
-                .Where(q => q.Key != targetUser).ToDictionary(k => k.Key, v => v.Value))
+                .Where(q => q.Key != targetUser.UserId).ToDictionary(k => k.Key, v => v.Value))
             {
 
                 foreach (KeyValuePair<int, double> keyValue in nearestNeighbours)
@@ -30,7 +27,7 @@ namespace Assignment1.Components
 
                     if (userId == userPreference.Key)
                     {
-                        double givenRating;
+                        double givenRating = 0;
                         userPreference.Value.Ratings.TryGetValue(itemToRate, out givenRating);
 
                         numerator += (similarity * givenRating);

@@ -14,11 +14,12 @@ namespace Assignment1
             var data = GetDictionary();
 
             //Run exercises
-            SlideExercises();
+            //SlideExercises();
             AssignmentOnedotOne(data);
             AssignmentOnedotTwo(data);
             AssignmentOnedotThree(data);
             AssignmentOnedotFour(data);
+            AssignmentOnedotFive(data);
 
             Console.ReadKey();
         }
@@ -84,15 +85,16 @@ namespace Assignment1
         }
 
         private static void PredictRating(Dictionary<int, UserPreference> userPreferences,
-            int targetUser, List<int> itemsToRate, double threshold, int max, Similarity similarityType)
+            UserPreference targetUser, List<int> itemsToRate, double threshold, int max, Similarity similarityType)
         {
-            Console.WriteLine("\nPrediction(s) for user " + targetUser + ":");
+            Console.WriteLine("\nPrediction(s) for user " + targetUser.UserId + ":");
             Console.WriteLine("------------------------------------------");
 
             foreach (var item in itemsToRate)
             {
-                var prediction = new PredictRating().PredictRatingByNeighbours(userPreferences,
-                targetUser, item, threshold, max, similarityType);
+                var target = userPreferences.FirstOrDefault(q => q.Key == targetUser.UserId).Value;
+                var prediction = new PredictRating().PredictRatingByNeighbours(userPreferences, 
+                    target, item, threshold, max, similarityType);
                 Console.WriteLine("Item " + item + " with a rating of " + prediction);
             }
         }
@@ -228,7 +230,8 @@ namespace Assignment1
             items.Add(103);
             items.Add(106);
 
-            PredictRating(userPreferences, 7, items, 0.35, 3, Similarity.Pearson);
+            var target = userPreferences.FirstOrDefault(q => q.Key == 7).Value;
+            PredictRating(userPreferences, target, items, 0.35, 3, Similarity.Pearson);
         }
 
         private static void AssignmentOnedotFour(Dictionary<int, UserPreference> userPreferences)
@@ -236,7 +239,20 @@ namespace Assignment1
             List<int> items = new List<int>();
             items.Add(101);
 
-            PredictRating(userPreferences, 4, items, 0.35, 3, Similarity.Pearson);
+            var target = userPreferences.FirstOrDefault(q => q.Key == 4).Value;
+            PredictRating(userPreferences, target, items, 0.35, 3, Similarity.Pearson);
+        }
+
+        private static void AssignmentOnedotFive(Dictionary<int, UserPreference> userPreferences)
+        {
+            List<int> items = new List<int>();
+            items.Add(101);
+            items.Add(103);
+
+            var target = userPreferences.FirstOrDefault(q => q.Key == 7).Value;
+            target.AddRating(106, 2.8);
+
+            PredictRating(userPreferences, target, items, 0.35, 3, Similarity.Pearson);
         }
 
         #endregion
