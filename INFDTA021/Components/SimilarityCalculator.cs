@@ -105,29 +105,6 @@ namespace Assignment1.Components
 
         public double Pearson(UserPreference userOne, UserPreference userTwo)
         {
-            Dictionary<int, double?> userOneRating = new Dictionary<int, double?>();
-            Dictionary<int, double?> userTwoRating = new Dictionary<int, double?>();
-
-            //Check if each article has a rating
-            foreach (var rating in userOne.Ratings)
-            {
-                int? itemId = rating.Key;
-                double? givenRating = rating.Value;
-
-                if (itemId != null && givenRating != null)
-                    userOneRating.Add((int)itemId, (double)givenRating);
-            }
-
-            //Check if each article has a rating
-            foreach (var rating in userTwo.Ratings)
-            {
-                int? itemId = rating.Key;
-                double? givenRating = rating.Value;
-
-                if (itemId != null && givenRating != null)
-                    userTwoRating.Add((int)itemId, (double)givenRating);
-            }
-
             //Calculate the Pearson correlation
             double coefficient = 0;
             double sumXY = 0;
@@ -143,18 +120,12 @@ namespace Assignment1.Components
                 {
                     if (keyValueOne.Key == keyValueTwo.Key)
                     {
-                        double? ratingUserOne;
-                        userOneRating.TryGetValue(keyValueOne.Key, out ratingUserOne);
+                        sumX += keyValueOne.Value;
+                        sumY += keyValueTwo.Value;
+                        sumXY += (keyValueOne.Value * keyValueTwo.Value);
 
-                        double? ratingUserTwo;
-                        userTwoRating.TryGetValue(keyValueTwo.Key, out ratingUserTwo);
-
-                        sumX += ratingUserOne.Value;
-                        sumY += ratingUserTwo.Value;
-                        sumXY += (ratingUserOne.Value * ratingUserTwo.Value);
-
-                        sumPowerX += Math.Pow(ratingUserOne.Value, 2);
-                        sumPowerY += Math.Pow(ratingUserTwo.Value, 2);
+                        sumPowerX += Math.Pow(keyValueOne.Value, 2);
+                        sumPowerY += Math.Pow(keyValueTwo.Value, 2);
 
                         total++;
                     }

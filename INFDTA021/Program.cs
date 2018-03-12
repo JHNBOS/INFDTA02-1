@@ -14,16 +14,16 @@ namespace Assignment1
             var data = GetDictionary();
 
             //Run exercises
-            //SlideExercises
-            //AssignmentOnedotOne(data);
-            //AssignmentOnedotTwo(data);
-            //AssignmentOnedotThree(data);
+            SlideExercises();
+            AssignmentOnedotOne(data);
+            AssignmentOnedotTwo(data);
+            AssignmentOnedotThree(data);
             AssignmentOnedotFour(data);
 
             Console.ReadKey();
         }
 
-        #region Calculate Methods
+        #region Calculation Methods
 
         private static double CalculateEuclidian(UserPreference one, UserPreference two)
         {
@@ -50,51 +50,49 @@ namespace Assignment1
         }
 
         private static void FindNearestNeighbour(Dictionary<int, UserPreference> userPreferences, int targetUser,
-            double threshold, int max)
+            double threshold, int max, Similarity similarityType)
         {
-            Dictionary<int, double> nearestNeighbourEuclidian = new Dictionary<int, double>();
-            Dictionary<int, double> nearestNeighbourPearson = new Dictionary<int, double>();
-            Dictionary<int, double> nearestNeighbourCosine = new Dictionary<int, double>();
-
             //Get nearest neighbours
-            var nearestNeighbours = new NearestNeighbourCalculator().FindNearestNeighbour(userPreferences, targetUser,
-                threshold, max);
-            nearestNeighbours.TryGetValue(1, out nearestNeighbourEuclidian);
-            nearestNeighbours.TryGetValue(2, out nearestNeighbourPearson);
-            nearestNeighbours.TryGetValue(3, out nearestNeighbourCosine);
+            var nearestNeighbours = new NearestNeighbour().FindNearestNeighbour(userPreferences, targetUser,
+                threshold, max, similarityType);
 
-            Console.WriteLine("\nNearest neighbours using Euclidian:");
-            Console.WriteLine("------------------------------------------");
-            foreach (KeyValuePair<int, double> item in nearestNeighbourEuclidian.OrderBy(o => o.Value).Take(max))
+            //Write results to console
+            switch (similarityType)
             {
-                Console.WriteLine("User " + item.Key + " with a distance of " + item.Value);
-            }
+                case Similarity.Euclidian:
+                    Console.WriteLine("\nNearest neighbours using Euclidian:");
+                    Console.WriteLine("------------------------------------------");
+                    foreach (KeyValuePair<int, double> item in nearestNeighbours)
+                        Console.WriteLine("User " + item.Key + " with a distance of " + item.Value);
 
-            Console.WriteLine("\nNearest neighbours using Pearson:");
-            Console.WriteLine("------------------------------------------");
-            foreach (KeyValuePair<int, double> item in nearestNeighbourPearson.OrderByDescending(o => o.Value).Take(max))
-            {
-                Console.WriteLine("User " + item.Key + " with a distance of " + item.Value);
-            }
+                    break;
+                case Similarity.Pearson:
+                    Console.WriteLine("\nNearest neighbours using Pearson:");
+                    Console.WriteLine("------------------------------------------");
+                    foreach (KeyValuePair<int, double> item in nearestNeighbours)
+                        Console.WriteLine("User " + item.Key + " with a distance of " + item.Value);
 
-            Console.WriteLine("\nNearest neighbours using Cosine:");
-            Console.WriteLine("------------------------------------------");
-            foreach (KeyValuePair<int, double> item in nearestNeighbourCosine.OrderByDescending(o => o.Value).Take(max))
-            {
-                Console.WriteLine("User " + item.Key + " with a correlation of " + item.Value);
+                    break;
+                case Similarity.Cosine:
+                    Console.WriteLine("\nNearest neighbours using Cosine:");
+                    Console.WriteLine("------------------------------------------");
+                    foreach (KeyValuePair<int, double> item in nearestNeighbours)
+                        Console.WriteLine("User " + item.Key + " with a correlation of " + item.Value);
+
+                    break;
             }
         }
 
         private static void PredictRating(Dictionary<int, UserPreference> userPreferences,
-            int targetUser, List<int> itemsToRate, double threshold, int max)
+            int targetUser, List<int> itemsToRate, double threshold, int max, Similarity similarityType)
         {
             Console.WriteLine("\nPrediction(s) for user " + targetUser + ":");
             Console.WriteLine("------------------------------------------");
 
             foreach (var item in itemsToRate)
             {
-                var prediction = new PredictRatingCalculator().PredictRatingByNeighbours(userPreferences,
-                targetUser, item, threshold, max);
+                var prediction = new PredictRating().PredictRatingByNeighbours(userPreferences,
+                targetUser, item, threshold, max, similarityType);
                 Console.WriteLine("Item " + item + " with a rating of " + prediction);
             }
         }
@@ -203,7 +201,7 @@ namespace Assignment1
             var four = CalculateCosine(clara, robert);
             var five = CalculateCosine(amyTwo, xTwo);
 
-            Console.WriteLine("Euclidian between Amy and X = " + one);
+            Console.WriteLine("\nEuclidian between Amy and X = " + one);
             Console.WriteLine("Manhattann between Amy and X = " + two);
             Console.WriteLine("Pearson between Clara and Robert = " + three);
             Console.WriteLine("Cosine between Clara and Robert = " + four);
@@ -218,7 +216,9 @@ namespace Assignment1
 
         private static void AssignmentOnedotTwo(Dictionary<int, UserPreference> userPreferences)
         {
-            FindNearestNeighbour(userPreferences, 7, 0.35, 3);
+            FindNearestNeighbour(userPreferences, 7, 0.35, 3,Similarity.Euclidian);
+            FindNearestNeighbour(userPreferences, 7, 0.35, 3, Similarity.Pearson);
+            FindNearestNeighbour(userPreferences, 7, 0.35, 3, Similarity.Cosine);
         }
 
         private static void AssignmentOnedotThree(Dictionary<int, UserPreference> userPreferences)
@@ -228,7 +228,7 @@ namespace Assignment1
             items.Add(103);
             items.Add(106);
 
-            PredictRating(userPreferences, 7, items, 0.35, 3);
+            PredictRating(userPreferences, 7, items, 0.35, 3, Similarity.Pearson);
         }
 
         private static void AssignmentOnedotFour(Dictionary<int, UserPreference> userPreferences)
@@ -236,7 +236,7 @@ namespace Assignment1
             List<int> items = new List<int>();
             items.Add(101);
 
-            PredictRating(userPreferences, 4, items, 0.35, 3);
+            PredictRating(userPreferences, 4, items, 0.35, 3, Similarity.Pearson);
         }
 
         #endregion
