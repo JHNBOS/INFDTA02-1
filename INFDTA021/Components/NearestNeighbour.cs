@@ -6,92 +6,64 @@ namespace Assignment1.Components
 {
     public class NearestNeighbour
     {
-        public Dictionary<int, double> FindNearestNeighbour(Dictionary<int, UserPreference> userPreferences,
+        private Dictionary<int, double> neighbours = new Dictionary<int, double>();
+
+        public Dictionary<int, double> FindNearestNeighbour(Dictionary<int, Dictionary<int, double>> ratings,
                 int targetUser, double threshold, int max, Similarity similarityType)
         {
-            //Get target user
-            var target = userPreferences.FirstOrDefault(q => q.Key == targetUser).Value;
+            //Get target user from list of ratings
+            var target = ratings.FirstOrDefault(q => q.Key == targetUser).Value;
 
-            //Skip target user
-            var list = userPreferences.OrderBy(o => o.Key).Where(q => q.Key != targetUser)
-                .ToDictionary(k => k.Key, v => v.Value);
-
-            //Loop through each user in the list, and if similarity is above the threshold,
-            //add user to list of neighbours
-            var results = new Dictionary<int, double>();
-            foreach (var neighbour in list)
+            foreach (var user in ratings)
             {
-                int user = neighbour.Key;
-                UserPreference preference = neighbour.Value;
-
-                switch (similarityType)
+                if (user.Key != targetUser)
                 {
-                    case Similarity.Euclidian:
-                        var euclidian = 1 / (1 + new SimilarityCalculator().Euclidian(preference, target));
-                        if (euclidian > threshold && HasRatedAdditionalItems(preference, target))
+                    double similarity = 0;
+
+                    //Convert ratings of both users to vectors
+                    var vectors = new Helper().ConvertToVector(user.Value, target, similarityType);
+
+                    //Calculate similarity based on similarity type
+                    switch (similarityType)
+                    {
+                        case Similarity.Euclidian:
+                            similarity = new SimilarityCalculator().Euclidian(vectors.Item1, vectors.Item2);
+                            break;
+                        case Similarity.Pearson:
+                            similarity = new SimilarityCalculator().Pearson(vectors.Item1, vectors.Item2);
+                            break;
+                        case Similarity.Cosine:
+                            similarity = new SimilarityCalculator().Cosine(vectors.Item1, vectors.Item2);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    //Check if similarity is above threshold
+                    if (similarity > threshold && HasRatedAdditionalItems(vectors.Item1, vectors.Item2))
+                    {
+                        if (neighbours.Count < max)
                         {
-                            if (results.Count < max)
+                            neighbours.Add(user.Key, similarity);
+                        } else
+                        {
+                            var lowest = neighbours.OrderBy(o => o.Value).ElementAt(0);
+                            if (similarity > lowest.Value)
                             {
-                                results.Add(user, euclidian);
-                            } else
-                            {
-                                var lowest = results.OrderBy(o => o.Value).ElementAt(0);
-                                if (euclidian > lowest.Value)
-                                    results.Add(user, euclidian);
+                                neighbours.Remove(lowest.Key);
+                                neighbours.Add(user.Key, similarity);
                             }
                         }
-
-                        results = results.OrderBy(o => o.Value).Take(max)
-                            .ToDictionary(k => k.Key, v => v.Value);
-
-                        break;
-                    case Similarity.Pearson:
-                        var pearson = new SimilarityCalculator().Pearson(preference, target);
-                        if (pearson > threshold && HasRatedAdditionalItems(preference, target))
-                        {
-                            if (results.Count < max)
-                            {
-                                results.Add(user, pearson);
-                            } else
-                            {
-                                var lowest = results.OrderBy(o => o.Value).ElementAt(0);
-                                if (pearson > lowest.Value)
-                                    results.Add(user, pearson);
-                            }
-                        }
-
-                        results = results.OrderByDescending(o => o.Value).Take(max)
-                            .ToDictionary(k => k.Key, v => v.Value);
-
-                        break;
-                    case Similarity.Cosine:
-                        var cosine = new SimilarityCalculator().Cosine(preference, target);
-                        if (cosine > threshold && HasRatedAdditionalItems(preference, target))
-                        {
-                            if (results.Count < max)
-                            {
-                                results.Add(user, cosine);
-                            } else
-                            {
-                                var lowest = results.OrderBy(o => o.Value).ElementAt(0);
-                                if (cosine > lowest.Value)
-                                    results.Add(user, cosine);
-                            }
-                        }
-
-                        results = results.OrderByDescending(o => o.Value).Take(max)
-                            .ToDictionary(k => k.Key, v => v.Value);
-
-                        break;
+                    }
                 }
             }
 
-            return results;
+            return neighbours;
         }
 
-        private bool HasRatedAdditionalItems(UserPreference userToCompare, UserPreference target)
+        private bool HasRatedAdditionalItems(Vector userToCompare, Vector target)
         {
-            bool hasRatedSameItems = userToCompare.Ratings.Keys.Any(q => !target.Ratings.Keys.Contains(q));
+            bool hasRatedSameItems = userToCompare.GetPoints().Any(q => !target.GetPoints().Contains(q));
             return hasRatedSameItems;
         }
 
