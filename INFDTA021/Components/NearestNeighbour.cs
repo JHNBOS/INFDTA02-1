@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Assignment1.Components.Similarities;
 using Assignment1.Models;
 
 namespace Assignment1.Components
@@ -27,13 +28,13 @@ namespace Assignment1.Components
                     switch (similarityType)
                     {
                         case Similarity.Euclidian:
-                            similarity = new SimilarityCalculator().Euclidian(vectors.Item1, vectors.Item2);
+                            similarity = new Euclidian().Calculate(vectors.Item1, vectors.Item2);
                             break;
                         case Similarity.Pearson:
-                            similarity = new SimilarityCalculator().Pearson(vectors.Item1, vectors.Item2);
+                            similarity = new Pearson().Calculate(vectors.Item1, vectors.Item2);
                             break;
                         case Similarity.Cosine:
-                            similarity = new SimilarityCalculator().Cosine(vectors.Item1, vectors.Item2);
+                            similarity = new Cosine().Calculate(vectors.Item1, vectors.Item2);
                             break;
                         default:
                             break;

@@ -34,7 +34,7 @@ namespace Assignment1.Components
         }
 
         public Dictionary<int, double> PredictTopRatings(Dictionary<int, Dictionary<int, double>> ratings,
-            int targetUser, double threshold, int maxNeighhbours, int maxResults,
+            int targetUser, double threshold, int maxNeighhbours, int maxResults, int? minimumRatings,
             Similarity similarityType)
         {
             var predictions = new Dictionary<int, double>();
@@ -51,12 +51,29 @@ namespace Assignment1.Components
                 }
             }
 
+            //Get nearest neighbours
+            var neighbours = new NearestNeighbour().FindNearestNeighbour(ratings, targetUser, threshold, maxNeighhbours, similarityType);
+
             //Loop through all items and predict the rating
             foreach (var item in items)
             {
-                var prediction = PredictRatingByNeighbours(ratings, targetUser, item, threshold, maxNeighhbours, 
+                var itemCount = 0;
+                if (itemCount < minimumRatings)
+                {
+                    foreach (var neighbour in neighbours)
+                    {
+                        if (ratings[neighbour.Key].ContainsKey(item))
+                        {
+                            itemCount++;
+                        }
+                    }
+                }
+                if (itemCount >= minimumRatings || minimumRatings == null)
+                {
+                    var prediction = PredictRatingByNeighbours(ratings, targetUser, item, threshold, maxNeighhbours,
                     similarityType);
-                predictions.Add(item, prediction);
+                    predictions.Add(item, prediction);
+                }
             }
 
             return predictions.OrderByDescending(o => o.Value).Take(maxResults).ToDictionary(k => k.Key, v => v.Value);

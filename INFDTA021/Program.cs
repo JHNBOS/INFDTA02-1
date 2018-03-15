@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assignment1.Components;
+using Assignment1.Components.Similarities;
 using Assignment1.Models;
 
 namespace Assignment1
 {
     class Program
     {
-        static SimilarityCalculator similarityCalculator;
-
         static void Main(string[] args)
         {
-            //Init objects
-            similarityCalculator = new SimilarityCalculator();
-
             //Get dataset
             //var data = GetData(',');
 
@@ -84,11 +80,11 @@ namespace Assignment1
             listX2.Add(2.0);
             Vector xTwo = new Vector(listX2);
 
-            var one = similarityCalculator.Euclidian(amy, x);
-            var two = similarityCalculator.Manhattan(amy, x);
-            var three = similarityCalculator.Pearson(clara, robert);
-            var four = similarityCalculator.Cosine(clara, robert);
-            var five = similarityCalculator.Cosine(amyTwo, xTwo);
+            var one = new Euclidian().Calculate(amy, x);
+            var two = new Manhattan().Calculate(amy, x);
+            var three = new Pearson().Calculate(clara, robert);
+            var four = new Cosine().Calculate(clara, robert);
+            var five = new Cosine().Calculate(amyTwo, xTwo);
 
             Console.WriteLine("\nEuclidian between Amy and X = " + one);
             Console.WriteLine("Manhattan between Amy and X = " + two);
@@ -107,7 +103,7 @@ namespace Assignment1
             var vectors = new Helper().ConvertToVector(userThree, userFour, Similarity.Pearson);
 
             //Calculate pearson coefficient
-            var result = similarityCalculator.Pearson(vectors.Item1, vectors.Item2);
+            var result = new Pearson().Calculate(vectors.Item1, vectors.Item2);
 
             Console.WriteLine("\n\nAssignment 1.1");
             Console.WriteLine("------------------------------------------");
