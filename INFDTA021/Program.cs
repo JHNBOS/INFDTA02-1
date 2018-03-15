@@ -16,7 +16,7 @@ namespace Assignment1
             similarityCalculator = new SimilarityCalculator();
 
             //Get dataset
-            var data = GetData(',');
+            //var data = GetData(',');
 
             //Run exercises
             //ExercisesLessonOne();
@@ -27,8 +27,9 @@ namespace Assignment1
             //AssignmentOnedotFive(data, 7, Similarity.Pearson);
             //AssignmentOnedotSix(data, 7, Similarity.Pearson);
 
-            data = GetData('\t');
-            AssignmentOnedotSeven(data, 186, Similarity.Pearson, 0.35, 25, 8);
+            var data = GetData('\t');
+            AssignmentOnedotSeven(data, 186, Similarity.Pearson, 0.35, 25, 8, null);
+            AssignmentOnedotEight(data, 186, Similarity.Pearson, 0.35, 25, 8, 3);
 
             Console.ReadKey();
         }
@@ -256,14 +257,30 @@ namespace Assignment1
         }
 
         private static void AssignmentOnedotSeven(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType,
-            double threshold, int maxNeighhbours, int maxResults)
+            double threshold, int maxNeighhbours, int maxResults, int? minimumRatings)
         {
             Console.WriteLine("\n\nAssignment 1.7");
             Console.WriteLine("------------------------------------------");
-            Console.WriteLine("Rating predictions for user " + targetUser + " with item 106 rated with a 5.0");
+            Console.WriteLine("Rating predictions for user " + targetUser);
 
             var predictions = new PredictRating().PredictTopRatings(ratings, targetUser,
-                0.35, 25, 8, similarityType);
+                0.35, 25, 8, minimumRatings, similarityType);
+
+            foreach (var prediction in predictions)
+            {
+                Console.WriteLine("\tUser " + targetUser + " will rate item " + prediction.Key + " with a rating of " + prediction.Value);
+            }
+        }
+
+        private static void AssignmentOnedotEight(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType,
+            double threshold, int maxNeighhbours, int maxResults, int? minimumRatings)
+        {
+            Console.WriteLine("\n\nAssignment 1.8");
+            Console.WriteLine("------------------------------------------");
+            Console.WriteLine("Rating predictions for user " + targetUser + " with a minimum of " + minimumRatings + " items rated");
+
+            var predictions = new PredictRating().PredictTopRatings(ratings, targetUser,
+                0.35, 25, 8, minimumRatings, similarityType);
 
             foreach (var prediction in predictions)
             {

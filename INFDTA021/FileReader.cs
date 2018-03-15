@@ -12,11 +12,11 @@ namespace Assignment1
         {
             var entries = new Dictionary<int, Dictionary<int, double>>();
 
-            var lines = File.ReadAllLines(path)
-                .Select(l => l.Split(delimiter).ToList());
-
             try
             {
+                var lines = File.ReadAllLines(path)
+                .Select(l => l.Split(delimiter).ToList());
+
                 foreach (var line in lines)
                 {
                     var user = int.Parse(line[0].Trim());
@@ -33,7 +33,9 @@ namespace Assignment1
                 }
             } catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine("\nInvalid file path...");
+                Console.ReadKey();
+                System.Environment.Exit(0);
             }
 
             return entries;
