@@ -41,14 +41,14 @@ namespace Assignment1.Components
                     }
 
                     //Check if similarity is above threshold
-                    if (similarity > threshold && HasRatedAdditionalItems(vectors.Item1, vectors.Item2))
+                    if (similarity > threshold && HasRatedAdditionalItems(user.Value, target))
                     {
                         if (neighbours.Count < max)
                         {
                             neighbours.Add(user.Key, similarity);
                         } else
                         {
-                            var lowest = neighbours.OrderBy(o => o.Value).ElementAt(0);
+                            var lowest = neighbours.OrderBy(o => o.Value).First();
                             if (similarity > lowest.Value)
                             {
                                 neighbours.Remove(lowest.Key);
@@ -62,10 +62,9 @@ namespace Assignment1.Components
             return neighbours;
         }
 
-        private bool HasRatedAdditionalItems(Vector userToCompare, Vector target)
+        private bool HasRatedAdditionalItems(Dictionary<int, double> userToCompare, Dictionary<int, double> target)
         {
-            bool hasRatedSameItems = userToCompare.GetPoints().Any(q => !target.GetPoints().Contains(q));
-            return hasRatedSameItems;
+            return userToCompare.Any(a => target.Keys.Contains(a.Key) == false);
         }
 
     }

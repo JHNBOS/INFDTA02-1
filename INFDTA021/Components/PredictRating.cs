@@ -34,25 +34,22 @@ namespace Assignment1.Components
         }
 
         public Dictionary<int, double> PredictTopRatings(Dictionary<int, Dictionary<int, double>> ratings,
-            int targetUser, double threshold, int maxNeighhbours, int maxResults, int? minimumRatings,
-            Similarity similarityType)
+            Dictionary<int, double> neighbours, int targetUser, double threshold, 
+            int maxNeighhbours, int maxResults, int? minimumRatings, Similarity similarityType)
         {
             var predictions = new Dictionary<int, double>();
             var items = new List<int>();
 
-            foreach (var user in ratings)
+            foreach (var user in ratings.Values)
             {
-                foreach (var item in user.Value)
+                foreach (var item in user)
                 {
-                    if (items.Contains(item.Key) == false)
+                    if (!items.Contains(item.Key))
                     {
                         items.Add(item.Key);
                     }
                 }
             }
-
-            //Get nearest neighbours
-            var neighbours = new NearestNeighbour().FindNearestNeighbour(ratings, targetUser, threshold, maxNeighhbours, similarityType);
 
             //Loop through all items and predict the rating
             foreach (var item in items)

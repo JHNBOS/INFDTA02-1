@@ -5,4 +5,18 @@
     <TargetFramework>netcoreapp1.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Data\movie.data" />
+    <None Remove="Data\userItem.data" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\movie.data">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\userItem.data">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

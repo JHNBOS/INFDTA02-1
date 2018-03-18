@@ -11,32 +11,28 @@ namespace Assignment1
     {
         static void Main(string[] args)
         {
-            //Get dataset
-            //var data = GetData(',');
-
-            //Run exercises
             //ExercisesLessonOne();
-            //AssignmentOnedotOne(data);
-            //AssignmentOnedotTwo(data, 7, 0.35, 3, Similarity.EuclidianAndPearsonAndCosine);
-            //AssignmentOnedotThree(data, 7, Similarity.Pearson);
-            //AssignmentOnedotFour(data, 4, Similarity.Pearson);
-            //AssignmentOnedotFive(data, 7, Similarity.Pearson);
-            //AssignmentOnedotSix(data, 7, Similarity.Pearson);
 
-            var data = GetData('\t');
+            //Get user item dataset
+            var data = GetData(',', "./Data/userItem.data");
+            AssignmentOnedotOne(data);
+            AssignmentOnedotTwo(data, 7, 0.35, 3, Similarity.EuclidianAndPearsonAndCosine);
+            AssignmentOnedotThree(data, 7, Similarity.Pearson);
+            AssignmentOnedotFour(data, 4, Similarity.Pearson);
+            AssignmentOnedotFive(data, 7, Similarity.Pearson);
+            AssignmentOnedotSix(data, 7, Similarity.Pearson);
+
+            //Get movie dataset
+            data = GetData('\t', "./Data/movie.data");
             AssignmentOnedotSeven(data, 186, Similarity.Pearson, 0.35, 25, 8, null);
             AssignmentOnedotEight(data, 186, Similarity.Pearson, 0.35, 25, 8, 3);
 
             Console.ReadKey();
         }
 
-        private static Dictionary<int, Dictionary<int, double>> GetData(char delimiter)
+        private static Dictionary<int, Dictionary<int, double>> GetData(char delimiter, string path)
         {
-            Console.WriteLine("Please enter the path to the dataset:");
-
-            var path = Console.ReadLine();
             var data = new FileReader().Parse(delimiter, path);
-
             return data;
         }
 
@@ -105,7 +101,7 @@ namespace Assignment1
             //Calculate pearson coefficient
             var result = new Pearson().Calculate(vectors.Item1, vectors.Item2);
 
-            Console.WriteLine("\n\nAssignment 1.1");
+            Console.WriteLine("\n\n## Assignment 1.1");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine(String.Format("Pearson coefficient between user {0} and user {1} is {2}", 3, 4, result));
         }
@@ -113,7 +109,7 @@ namespace Assignment1
         private static void AssignmentOnedotTwo(Dictionary<int, Dictionary<int, double>> ratings, int user,
             double threshold, int max, Similarity similarityType)
         {
-            Console.WriteLine("\n\nAssignment 1.2");
+            Console.WriteLine("\n\n## Assignment 1.2");
             Console.WriteLine("------------------------------------------");
 
             var nearestNeighbours = new Dictionary<int, double>();
@@ -130,23 +126,22 @@ namespace Assignment1
                         max, sim);
 
                     var loop = new Dictionary<int, double>();
-
                     switch (sim)
                     {
                         case Similarity.Euclidian:
                             loop = nearestNeighbours.OrderBy(o => o.Value).Take(max)
                                 .ToDictionary(k => k.Key, v => v.Value);
-                            Console.WriteLine("Nearest neighbours using Euclidian are:\n");
+                            Console.WriteLine("Nearest neighbours using Euclidian are:");
                             break;
                         case Similarity.Pearson:
                             loop = nearestNeighbours.OrderByDescending(o => o.Value).Take(max)
                                 .ToDictionary(k => k.Key, v => v.Value);
-                            Console.WriteLine("\nNearest neighbours using Pearson are:\n");
+                            Console.WriteLine("\nNearest neighbours using Pearson are:");
                             break;
                         case Similarity.Cosine:
                             loop = nearestNeighbours.OrderByDescending(o => o.Value).Take(max)
                                 .ToDictionary(k => k.Key, v => v.Value);
-                            Console.WriteLine("\nNearest neighbours using Cosine are:\n");
+                            Console.WriteLine("\nNearest neighbours using Cosine are:");
                             break;
                         default:
                             break;
@@ -172,7 +167,7 @@ namespace Assignment1
 
         private static void AssignmentOnedotThree(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType)
         {
-            Console.WriteLine("\n\nAssignment 1.3");
+            Console.WriteLine("\n\n## Assignment 1.3");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser);
 
@@ -192,7 +187,7 @@ namespace Assignment1
 
         private static void AssignmentOnedotFour(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType)
         {
-            Console.WriteLine("\n\nAssignment 1.4");
+            Console.WriteLine("\n\n## Assignment 1.4");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser);
 
@@ -210,7 +205,7 @@ namespace Assignment1
 
         private static void AssignmentOnedotFive(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType)
         {
-            Console.WriteLine("\n\nAssignment 1.5");
+            Console.WriteLine("\n\n## Assignment 1.5");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser + " with item 106 rated with a 2.8");
 
@@ -232,7 +227,7 @@ namespace Assignment1
 
         private static void AssignmentOnedotSix(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType)
         {
-            Console.WriteLine("\n\nAssignment 1.6");
+            Console.WriteLine("\n\n## Assignment 1.6");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser + " with item 106 rated with a 5.0");
 
@@ -255,11 +250,12 @@ namespace Assignment1
         private static void AssignmentOnedotSeven(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType,
             double threshold, int maxNeighhbours, int maxResults, int? minimumRatings)
         {
-            Console.WriteLine("\n\nAssignment 1.7");
+            Console.WriteLine("\n\n## Assignment 1.7");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser);
 
-            var predictions = new PredictRating().PredictTopRatings(ratings, targetUser,
+            var neighbours = new NearestNeighbour().FindNearestNeighbour(ratings, targetUser, threshold, maxNeighhbours, similarityType);
+            var predictions = new PredictRating().PredictTopRatings(ratings, neighbours, targetUser,
                 0.35, 25, 8, minimumRatings, similarityType);
 
             foreach (var prediction in predictions)
@@ -271,11 +267,12 @@ namespace Assignment1
         private static void AssignmentOnedotEight(Dictionary<int, Dictionary<int, double>> ratings, int targetUser, Similarity similarityType,
             double threshold, int maxNeighhbours, int maxResults, int? minimumRatings)
         {
-            Console.WriteLine("\n\nAssignment 1.8");
+            Console.WriteLine("\n\n## Assignment 1.8");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("Rating predictions for user " + targetUser + " with a minimum of " + minimumRatings + " items rated");
 
-            var predictions = new PredictRating().PredictTopRatings(ratings, targetUser,
+            var neighbours = new NearestNeighbour().FindNearestNeighbour(ratings, targetUser, threshold, maxNeighhbours, similarityType);
+            var predictions = new PredictRating().PredictTopRatings(ratings, neighbours, targetUser,
                 0.35, 25, 8, minimumRatings, similarityType);
 
             foreach (var prediction in predictions)
